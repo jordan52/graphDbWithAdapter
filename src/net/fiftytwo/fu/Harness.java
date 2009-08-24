@@ -1,52 +1,90 @@
 package net.fiftytwo.fu;
 
-public class Harness {
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
+public class Harness {
 	
 	public static int NUM_SLICES = 10000;
-	public static float matrix[][] = new float[4][NUM_SLICES];
-	public static float trainingMatrix[][] = new float[4][NUM_SLICES];
+	public static float matrix[][];
+	public static float trainingMatrix[][];
 	
-	
-	public float a;
-	public float b;
+	public double a;
+	public double b;
 
 	public void initTrainingMatrix(){
 		//either read it off disk or create it procedurally:
+		trainingMatrix = new float[4][NUM_SLICES];
 		for(int i = 0; i < NUM_SLICES; i++){
 			//trainingMatrix[0][i] = (someValueFor X);
 			//trainingMatrix[0][i] = (someValueFor Y);
 		}
 	}
 
-	public void initMatrix(){
+	public static float[][] loadMatrix(String filename){
 		//read it off disk
-		for(int i = 0; i<NUM_SLICES;i++){
-			matrix[0][i] = i;
-			matrix[1][i] = i;
-			matrix[2][i] = Float.NaN;
-			matrix[3][i] = Float.NaN;
+		try{
+			ObjectInputStream in = new ObjectInputStream(new FileInputStream(filename));
+	        float[][] m = (float[][]) in.readObject();
+	        in.close();
+	        return m;
+		} catch (Exception e){
+			System.out.println("UNABLE TO READ MATRIX TO FILE, making one up for fun");
+			float m[][] = new float[4][NUM_SLICES];
+			for(int i = 0; i<NUM_SLICES;i++){
+				m[0][i] = i;
+				m[1][i] = i;
+				m[2][i] = Float.NaN;
+				m[3][i] = Float.NaN;
+			}
+			return m;
 		}
 	
 	}
 	
-	public void saveMatrix(){
+	public static void saveMatrix(String filename, float[][] m) {
 		//write it to disk
+		try{
+			ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filename));
+			out.writeObject(m);
+			out.flush();
+			out.close();
+		} catch (Exception e){
+			System.out.println("UNABLE TO WRITE MATRIX TO FILE");
+		}
 	}
 
 	public void train(){
 		//iterate 0 to NUM_SLICES to estimate a and b 
  		//in y = ax + b
-		float estimatedA = 0.0f, estimatedB = 0.0f, x, y;
-		for(int i = 0; i < NUM_SLICES; i++){
-			x = trainingMatrix[0][i];
-			y = trainingMatrix[1][i];
+		//copied from http://www.cs.princeton.edu/introcs/97data/LinearRegression.java.html
+        // first pass: read in data, compute xbar and ybar
+        double sumx = 0.0, sumy = 0.0, sumx2 = 0.0;
+        for(int i = 0; i < NUM_SLICES; i++){
+            sumx  += matrix[0][i];
+            sumx2 += matrix[0][i] * matrix[0][i];
+            sumy  += matrix[1][i];
+        }
+        double xbar = sumx / NUM_SLICES;
+        double ybar = sumy / NUM_SLICES;
 
-			//figure out what a and b should be.
-		}
-		
-		this.a = estimatedA;
-		this.b = estimatedB;
+        // second pass: compute summary statistics
+        double xxbar = 0.0, yybar = 0.0, xybar = 0.0;
+        for(int i = 0; i < NUM_SLICES; i++){
+            xxbar += (matrix[0][i] - xbar) * (matrix[0][i] - xbar);
+            yybar += (matrix[1][i] - ybar) * (matrix[1][i] - ybar);
+            xybar += (matrix[0][i] - xbar) * (matrix[1][i] - ybar);
+        }
+        double beta1 = xybar / xxbar;
+        double beta0 = ybar - beta1 * xbar;
+
+        // print results
+        System.out.println("y   = " + beta1 + " * x + " + beta0);
+
+        this.a = beta1;
+		this.b = beta0;
 	}
 
 
@@ -61,10 +99,10 @@ public class Harness {
 			matrix[2][currentSlice] = fit; 
 		} else if( x == Float.NaN){
 			//x = (y-b)/a ... is that right?
-			matrix[0][currentSlice] = (y-this.b)/this.a;
+			matrix[0][currentSlice] = (float) ((y-this.b)/this.a);
 		}  else if( y == Float.NaN){
 			//y = ax+b
-			matrix[1][currentSlice] = this.a*x + this.b;
+			matrix[1][currentSlice] = (float) (this.a*x + this.b);
 		}
 
 	}
@@ -73,7 +111,7 @@ public class Harness {
 
 		Harness h = new Harness();
 		h.initTrainingMatrix();
-		h.initMatrix();
+		Harness.matrix = Harness.loadMatrix("test.matrix");
 
 		h.train();
 
@@ -81,7 +119,7 @@ public class Harness {
 			h.run(i);
 		}
 		
-		h.saveMatrix();
+		Harness.saveMatrix("test.matrix", Harness.matrix);
 	}
 
 }
