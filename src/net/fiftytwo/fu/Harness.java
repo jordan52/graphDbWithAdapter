@@ -8,31 +8,32 @@ import java.io.ObjectOutputStream;
 public class Harness {
 	
 	public static int NUM_SLICES = 10000;
-	public static float matrix[][];
-	public static float trainingMatrix[][];
+	public static double matrix[][];
+	public static double trainingMatrix[][];
 	
+	//y = ax + b
 	public double a;
 	public double b;
 
 	public void initTrainingMatrix(){
 		//either read it off disk or create it procedurally:
-		trainingMatrix = new float[4][NUM_SLICES];
+		trainingMatrix = new double[4][NUM_SLICES];
 		for(int i = 0; i < NUM_SLICES; i++){
 			//trainingMatrix[0][i] = (someValueFor X);
 			//trainingMatrix[0][i] = (someValueFor Y);
 		}
 	}
 
-	public static float[][] loadMatrix(String filename){
+	public static double[][] loadMatrix(String filename){
 		//read it off disk
 		try{
 			ObjectInputStream in = new ObjectInputStream(new FileInputStream(filename));
-	        float[][] m = (float[][]) in.readObject();
+	        double[][] m = (double[][]) in.readObject();
 	        in.close();
 	        return m;
 		} catch (Exception e){
 			System.out.println("UNABLE TO READ MATRIX TO FILE, making one up for fun");
-			float m[][] = new float[4][NUM_SLICES];
+			double m[][] = new double[4][NUM_SLICES];
 			for(int i = 0; i<NUM_SLICES;i++){
 				m[0][i] = i;
 				m[1][i] = i;
@@ -44,7 +45,7 @@ public class Harness {
 	
 	}
 	
-	public static void saveMatrix(String filename, float[][] m) {
+	public static void saveMatrix(String filename, double[][] m) {
 		//write it to disk
 		try{
 			ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filename));
@@ -89,20 +90,20 @@ public class Harness {
 
 
 	public void run(int currentSlice){
-		float x = matrix[0][currentSlice];
-		float y = matrix[1][currentSlice];
+		double x = matrix[0][currentSlice];
+		double y = matrix[1][currentSlice];
 
-		float fit =0.0f;
+		double fit =0.0f;
 		//if both x and y exist, estimate the fit.
 		if( x != Float.NaN && y != Float.NaN){
 			//estimate the "goodness of fit"
 			matrix[2][currentSlice] = fit; 
 		} else if( x == Float.NaN){
 			//x = (y-b)/a ... is that right?
-			matrix[0][currentSlice] = (float) ((y-this.b)/this.a);
+			matrix[0][currentSlice] =  (y-this.b)/this.a;
 		}  else if( y == Float.NaN){
 			//y = ax+b
-			matrix[1][currentSlice] = (float) (this.a*x + this.b);
+			matrix[1][currentSlice] = this.a*x + this.b;
 		}
 
 	}
