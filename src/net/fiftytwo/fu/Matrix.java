@@ -17,12 +17,18 @@ public class Matrix {
 	
 	static Logger logger = Logger.getLogger(Matrix.class);
 
-	public double matrix[][];
+	public double matrix[][];  //matrix[height][width]
 	public int width;
 	public int height;
 	
-	public Matrix(int width, int height){
-		matrix = new double[width][height];
+	public Matrix(){
+		this.width = 0;
+		this.height = 0;
+		matrix = null;
+	}
+	
+	public Matrix(int height,int width){
+		matrix = new double[height][width];
 		this.width = width;
 		this.height = height;
 	}
@@ -50,8 +56,7 @@ public class Matrix {
 		}
 	}
 
-	//this is real crappy. I have to waste memory and be clumsy 
-	//because I don't know how many rows are in the file...
+	//this is real crap. 
 	public void readCsvFile(String filename){
 		try{			
 			CSVReader reader = new CSVReader(new FileReader(filename));
@@ -60,7 +65,7 @@ public class Matrix {
 		    this.width = ((String[]) myEntries.get(0)).length;
 			this.height = myEntries.size();
 			
-			matrix = new double[this.width][this.height];
+			matrix = new double[this.height][this.width];
 			String[] row = null;
 			for(int i = 0; i < height; i++){
 				row = ((String[])myEntries.get(i));
@@ -92,6 +97,7 @@ public class Matrix {
 			logger.error("Unable to write matrix csv file" + filename, e);
 		}
 	}
+	
 	/*
 	 * Generates a CSV string
 	 * (non-Javadoc)
@@ -100,6 +106,7 @@ public class Matrix {
 	public String toString(){
 		return this.toString(",");
 	}
+	
 	public String toString(String delimiter){
 		String newline = System.getProperty("line.separator");
 		StringBuffer sb = new StringBuffer();
@@ -115,4 +122,5 @@ public class Matrix {
 		}
 		return sb.toString();
 	}
+	
 }

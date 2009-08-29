@@ -1,13 +1,12 @@
 package net.fiftytwo.fu;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import org.apache.log4j.Logger;
 
 public class Harness {
+
+	static Logger logger = Logger.getLogger(Harness.class);
 	
-	public static int NUM_SLICES = 10000;
+	public static int NUM_SLICES = 100000;
 	public static Matrix matrix;
 	public static Matrix trainingMatrix;
 	
@@ -17,10 +16,12 @@ public class Harness {
 
 	public void initTrainingMatrix(){
 		//either read it off disk or create it procedurally:
-		trainingMatrix = new Matrix(4,NUM_SLICES);
-		for(int i = 0; i < NUM_SLICES; i++){
-			//trainingMatrix[0][i] = (someValueFor X);
-			//trainingMatrix[0][i] = (someValueFor Y);
+		trainingMatrix = new Matrix(NUM_SLICES,4);
+		for(int i = 0; i<NUM_SLICES;i++){
+			trainingMatrix.matrix[i][0] = i;
+			trainingMatrix.matrix[i][1] = i;
+			trainingMatrix.matrix[i][2] = Double.NaN;
+			trainingMatrix.matrix[i][3] = Double.NaN;
 		}
 	}
 
@@ -31,9 +32,9 @@ public class Harness {
         // first pass: read in data, compute xbar and ybar
         double sumx = 0.0, sumy = 0.0, sumx2 = 0.0;
         for(int i = 0; i < NUM_SLICES; i++){
-            sumx  += matrix.matrix[0][i];
-            sumx2 += matrix.matrix[0][i] * matrix.matrix[0][i];
-            sumy  += matrix.matrix[1][i];
+            sumx  += trainingMatrix.matrix[i][0];
+            sumx2 += trainingMatrix.matrix[i][0] * trainingMatrix.matrix[i][0];
+            sumy  += trainingMatrix.matrix[i][1];
         }
         double xbar = sumx / NUM_SLICES;
         double ybar = sumy / NUM_SLICES;
@@ -41,62 +42,74 @@ public class Harness {
         // second pass: compute summary statistics
         double xxbar = 0.0, yybar = 0.0, xybar = 0.0;
         for(int i = 0; i < NUM_SLICES; i++){
-            xxbar += (matrix.matrix[0][i] - xbar) * (matrix.matrix[0][i] - xbar);
-            yybar += (matrix.matrix[1][i] - ybar) * (matrix.matrix[1][i] - ybar);
-            xybar += (matrix.matrix[0][i] - xbar) * (matrix.matrix[1][i] - ybar);
+            xxbar += (trainingMatrix.matrix[i][0] - xbar) * (trainingMatrix.matrix[i][0] - xbar);
+            yybar += (trainingMatrix.matrix[i][1] - ybar) * (trainingMatrix.matrix[i][1] - ybar);
+            xybar += (trainingMatrix.matrix[i][0] - xbar) * (trainingMatrix.matrix[i][1] - ybar);
         }
         double beta1 = xybar / xxbar;
         double beta0 = ybar - beta1 * xbar;
 
         // print results
-        System.out.println("y   = " + beta1 + " * x + " + beta0);
+        logger.info("y   = " + beta1 + " * x + " + beta0);
 
         this.a = beta1;
 		this.b = beta0;
 	}
 
-
 	public void run(int currentSlice){
-		double x = matrix.matrix[0][currentSlice];
-		double y = matrix.matrix[1][currentSlice];
 
-		double fit =0.0f;
+		Double x = matrix.matrix[currentSlice][0];
+		Double y = matrix.matrix[currentSlice][1];
+		Double fit = Double.NaN;
+
 		//if both x and y exist, estimate the fit.
-		if( x != Double.NaN && y != Double.NaN){
+		if(!( Double.isNaN(x) || Double.isNaN(y))){
 			//estimate the "goodness of fit"
-			matrix.matrix[2][currentSlice] = fit; 
-		} else if( x == Double.NaN){
+			matrix.matrix[currentSlice][2] = fit; 
+		} else if( Double.isNaN(x)){
 			//x = (y-b)/a ... is that right?
-			matrix.matrix[0][currentSlice] =  (y-this.b)/this.a;
-		}  else if( y == Double.NaN){
+			matrix.matrix[currentSlice][0] =  (y-this.b)/this.a;
+		}  else if(Double.isNaN(y)){
 			//y = ax+b
-			matrix.matrix[1][currentSlice] = this.a*x + this.b;
+			matrix.matrix[currentSlice][1] = this.a*x + this.b;
 		}
-
 	}
 
 	public static void main (String [] args){
 
+		logger.info("Starting Harness");
+		long startTime = System.currentTimeMillis();
+		
 		Harness h = new Harness();
 		h.initTrainingMatrix();
 		try{
-			Harness.matrix.read("test.matrix.matrix");
+			Harness.matrix.read("test.matrix");
 		} catch (Exception e){
-			Harness.matrix = new Matrix(4, NUM_SLICES);
+			Harness.matrix = new Matrix( NUM_SLICES, 4);
 			for(int i = 0; i<NUM_SLICES;i++){
-				Harness.matrix.matrix[0][i] = i;
-				Harness.matrix.matrix[1][i] = i;
-				Harness.matrix.matrix[2][i] = Double.NaN;
-				Harness.matrix.matrix[3][i] = Double.NaN;
+				Harness.matrix.matrix[i][0] = i;
+				Harness.matrix.matrix[i][1] = Double.NaN;
+				Harness.matrix.matrix[i][2] = Double.NaN;
+				Harness.matrix.matrix[i][3] = Double.NaN;
 			}
 		}
 		h.train();
 
+		long runTime = System.currentTimeMillis();
 		for(int i = 0; i < NUM_SLICES; i++){
 			h.run(i);
 		}
 		
-		Harness.matrix.write("test.matrix.matrix");
+		logger.info("Algorithm run time for " + NUM_SLICES + " slices was " + (System.currentTimeMillis() - runTime) + " ms.");
+		
+		Harness.matrix.write("test.matrix");
+		
+		//Let's test the CSV code
+		Harness.matrix.writeCsvFile("matrix.csv");
+		Matrix readCsv = new Matrix();
+		readCsv.readCsvFile("matrix.csv");
+		
+		logger.info("Total run time was " + (System.currentTimeMillis() - startTime) + " ms.");
 	}
 
 }
