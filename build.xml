@@ -39,7 +39,12 @@
 	      <classpath refid="project.class.path"/>
 	    </javac>
 	  </target>
-</project>
+    <target name="awesome" description="Run an app">
+      <java classname="net.fiftytwo.fu.Harness" fork="false">
+        <classpath refid="project.class.path"/>
+      </java>
+    </target>
+  </project>
 
 
 
