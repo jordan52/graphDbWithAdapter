@@ -14,13 +14,13 @@ public class LinearRegression extends Modeler {
    * These are stored in the fittedParameters array.
    */
   Double error = NaN;
-  Double[] fittedParameters;
+  Double[2] fittedParameters;
   LinearRegression(Matrix a) {
     sourceData = a;
-    fittedParameters = new Double(2);
   }
   Matrix sourceData;
   Matrix predictions;
+
   public void Fit() {
     //iterate 0 to NUM_SLICES to estimate a and b 
     //in y = ax + b
@@ -42,16 +42,17 @@ public class LinearRegression extends Modeler {
       yybar += (sourceData.matrix[i][1] - ybar) * (sourceData.matrix[i][1] - ybar);
       xybar += (sourceData.matrix[i][0] - xbar) * (sourceData.matrix[i][1] - ybar);
     }
-    double beta1 = xybar / xxbar;
-    double beta0 = ybar - beta1 * xbar;
+    double beta1 = ybar - beta1 * xbar;
+    double beta0 = xybar / xxbar;
 
     // print results
-    logger.info("y   = " + beta1 + " * x + " + beta0);
+    logger.info("y   = " + beta0 + " * x + " + beta1);
 
-    this.fittedParameters[0] = beta1; // a
-    this.fittedParameters[1] = beta0; // b
+    this.fittedParameters[0] = beta0; // a
+    this.fittedParameters[1] = beta1; // b
   }
   public Double PredictOnce(Double x) {
+    // y = ax + b
     return fittedParameters[0] * x + fittedParameters[1];
   }
   public void Predict() {
@@ -60,7 +61,13 @@ public class LinearRegression extends Modeler {
       predictions.matrix[i] = PredictOnce(sourceData.matrix[i][0]);
     }
   }
-  public void ComputeError() {
+  public void ComputeL1NormError() {
+    Double acc = 0.0;
+    for(int i = 0; i < predictions.length; i++) {
+      acc += abs(predictions.matrix[i] - sourceData.matrix[i][0]);
+    }
+  }
+  public void ComputeL2NormError() {
     Double acc = 0.0;
     for(int i = 0; i < predictions.length; i++) {
       acc += sqr(abs(predictions.matrix[i] - sourceData.matrix[i][0])); // Euclidean distance (L2-norm)
@@ -68,6 +75,34 @@ public class LinearRegression extends Modeler {
     error = acc;
   }
 }
-public static void Main(String[] args) {
+public static void main (string [] args){
 
+  logger.info("starting LinearRegression(Modeler) harness");
+  long starttime = system.currenttimemillis();
+
+  Matrix myData;
+  try{
+    myData.read("test.matrix");
+  } catch (exception e){
+    myData = new Matrix(num_slices, 2);
+    myData.fillLinear();
   }
+  //myData.fillNan();
+  myLinearRegression = new LinearRegression(myData);
+  long runtime = system.currenttimemillis();
+  myLinearRegression.Fit();
+  myLinearRegression.Predict();
+  myLinearRegression.ComputeL2NormError();
+  logger.info("linear regress test case 1: y = x");
+  logger.info("algorithm run time for " + num_slices + " slices was " + (system.currenttimemillis() - runtime) + " ms.");
+  myData.write("test.matrix");
+
+  //let's test the csv code
+  myData.writecsvfile("matrix.csv");
+  myData readcsv = new matrix();
+  readcsv.readcsvfile("matrix.csv");
+
+  logger.info("total run time was " + (system.currenttimemillis() - starttime) + " ms.");
+}
+
+//}
