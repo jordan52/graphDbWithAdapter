@@ -37,4 +37,9 @@
       <classpath refid="project.class.path"/>
     </java>
   </target>
+  <target name="linear" description="Run LinearRegression test.">
+    <java classname="net.fiftytwo.fu.LinearRegression" fork="false">
+      <classpath refid="project.class.path"/>
+    </java>
+  </target>
 </project>
