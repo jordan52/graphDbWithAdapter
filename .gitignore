@@ -44,3 +44,7 @@ docs/_build
 
 # virtualenv
 venv
+
+#intellij
+.idea/*                                               │
+graphDbWithAdapter.iml

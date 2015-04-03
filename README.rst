@@ -22,3 +22,14 @@ Features
 --------
 
 * None
+
+Use
+---
+
+* clone
+* cd graphDbWithAdapter
+* virtualenv venv
+* source venv/bin/activate
+* pip install -r requirements.txt
+* python -m unittest
+
