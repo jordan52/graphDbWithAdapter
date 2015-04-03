@@ -8,21 +8,7 @@ test_graphDbWithAdapter
 Tests for `graphDbWithAdapter` module.
 """
 
-import unittest
+from graphDbWithAdapter.__main__ import main
 
-from graphDbWithAdapter import graphDbWithAdapter
-
-
-class TestGraphdbwithadapter(unittest.TestCase):
-
-    def setUp(self):
-        pass
-
-    def test_something(self):
-        pass
-
-    def tearDown(self):
-        pass
-
-if __name__ == '__main__':
-    unittest.main()
+def test_main():
+    assert main([]) == 0
