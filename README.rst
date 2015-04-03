@@ -14,10 +14,11 @@ half-baked idea dump (now in python!)
 GraphDbWithAdapter is a meaningless name for a project that serves as a dump for various half-baked ideas in NLP and machine learning.
 
 Highlights include:
+
 * Free software: MIT license
 * Documentation: https://graphDbWithAdapter.readthedocs.org.
 
 Features
 --------
 
-* TODO
+* None
