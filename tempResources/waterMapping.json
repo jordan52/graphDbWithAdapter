@@ -1,0 +1,154 @@
+{
+    "template": "logstash-python*",
+    "settings": {
+        "number_of_replicas": "1"
+    },
+    "mappings": {
+        "logstash": {
+            "properties": {
+                "host": {
+                    "norms": {
+                        "enabled": false
+                    },
+                    "type": "string",
+                    "fields": {
+                        "raw": {
+                            "index": "not_analyzed",
+                            "ignore_above": 256,
+                            "type": "string"
+                        }
+                    }
+                },
+                "pressure": {
+                    "type": "double"
+                },
+                "location": {
+                     "type": "geo_point"
+                },
+                "segment": {
+                    "type": "long"
+                },
+                "flow": {
+                    "type": "double"
+                },
+                "geoip": {
+                    "dynamic": "true",
+                    "properties": {
+                        "location": {
+                            "type": "geo_point"
+                        }
+                    }
+                },
+                "type": {
+                    "norms": {
+                        "enabled": false
+                    },
+                    "type": "string",
+                    "fields": {
+                        "raw": {
+                            "index": "not_analyzed",
+                            "ignore_above": 256,
+                            "type": "string"
+                        }
+                    }
+                },
+                "shot": {
+                    "norms": {
+                        "enabled": false
+                    },
+                    "type": "string",
+                    "fields": {
+                        "raw": {
+                            "index": "not_analyzed",
+                            "ignore_above": 256,
+                            "type": "string"
+                        }
+                    }
+                },
+                "@version": {
+                    "index": "not_analyzed",
+                    "type": "string"
+                },
+                "temperature": {
+                    "type": "double"
+                },
+                "message": {
+                    "norms": {
+                        "enabled": false
+                    },
+                    "type": "string",
+                    "fields": {
+                        "raw": {
+                            "index": "not_analyzed",
+                            "ignore_above": 256,
+                            "type": "string"
+                        }
+                    }
+                },
+                "@timestamp": {
+                    "format": "dateOptionalTime",
+                    "type": "date"
+                },
+                "timeDate": {
+                    "format": "dateOptionalTime",
+                    "type": "date"
+                },
+                "company": {
+                    "norms": {
+                        "enabled": false
+                    },
+                    "type": "string",
+                    "fields": {
+                        "raw": {
+                            "index": "not_analyzed",
+                            "ignore_above": 256,
+                            "type": "string"
+                        }
+                    }
+                },
+                "logger": {
+                    "norms": {
+                        "enabled": false
+                    },
+                    "type": "string",
+                    "fields": {
+                        "raw": {
+                            "index": "not_analyzed",
+                            "ignore_above": 256,
+                            "type": "string"
+                        }
+                    }
+                },
+                "path": {
+                    "norms": {
+                        "enabled": false
+                    },
+                    "type": "string",
+                    "fields": {
+                        "raw": {
+                            "index": "not_analyzed",
+                            "ignore_above": 256,
+                            "type": "string"
+                        }
+                    }
+                },
+                "levelname": {
+                    "norms": {
+                        "enabled": false
+                    },
+                    "type": "string",
+                    "fields": {
+                        "raw": {
+                            "index": "not_analyzed",
+                            "ignore_above": 256,
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "_all": {
+                "enabled": true
+            }
+        }
+    }
+}

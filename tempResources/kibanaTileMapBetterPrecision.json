@@ -1,0 +1,10 @@
+{
+
+    "title": "second_map_average_flow",
+    "visState": "{\"type\":\"tile_map\",\"params\":{\"mapType\":\"Shaded Circle Markers\",\"isDesaturated\":false,\"spyPerPage\":10},\"aggs\":[{\"id\":\"1\",\"type\":\"avg\",\"schema\":\"metric\",\"params\":{\"field\":\"flow\"}},{\"id\":\"2\",\"type\":\"geohash_grid\",\"schema\":\"segment\",\"params\":{\"field\":\"location\",\"precision\":12,\"json\":\"\"}}],\"listeners\":{}}",
+    "description": "",
+    "version": 1,
+    "kibanaSavedObjectMeta": {
+        "searchSourceJSON": "{\"index\":\"logstash-*\",\"query\":{\"query_string\":{\"query\":\"company: atlantic\",\"analyze_wildcard\":true}},\"filter\":[]}"
+}
+}
